@@ -1,5 +1,10 @@
 #import "RNStoreReview.h"
-#import <StoreKit/SKStoreReviewController.h>
+#if __has_include(<StoreKit/SKStoreReviewController.h>)
+  #import <StoreKit/SKStoreReviewController.h>
+  #define HAS_STORE_KIT true
+#else
+  #define HAS_STORE_KIT false
+#endif
 
 @implementation RNStoreReview
 
@@ -12,14 +17,18 @@ RCT_EXPORT_MODULE()
 
 - (NSDictionary *)constantsToExport
 {
+  Class reviewController = NSClassFromString(@"SKStoreReviewController");
   return @{
-    @"isAvailable": [SKStoreReviewController class] ? @(YES) : @(NO)
+    @"isAvailable": reviewController != nil ? @(YES) : @(NO)
   };
 }
 
 RCT_EXPORT_METHOD(requestReview)
 {
-  [SKStoreReviewController requestReview];
+  Class reviewController = NSClassFromString(@"SKStoreReviewController");
+  if (reviewController != nil) {
+    [reviewController requestReview];
+  }
 }
 
 @end
